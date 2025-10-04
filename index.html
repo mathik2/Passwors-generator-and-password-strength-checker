@@ -2,63 +2,436 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Generator and Password strength Checker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        body {
-            background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Password Toolbox</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --success: #198754;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --primary: #2563eb;
+      --bg-light: #f4f8fb;
+      --bg-card: #ffffff;
+      --bg-dark: #181a1b;
+      --bg-dark-card: #23272b;
+      --text-dark: #22223b;
+      --text-light: #f1f1f1;
+      --accent: #0d6efd;
+    }
 
-        main>section {
-            display: grid;
-            place-items: center;
-        }
+    body {
+      font-family: Segoe UI, Arial, sans-serif;
+      background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text-dark);
+      background-attachment: fixed;
+    }
 
-        #result {
-            font-size: 2rem;
-        }
-        i:hover{
-            color: green;
-        }
-    </style>
+    main>.container {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 24px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: 0 6px 30px rgba(37, 99, 235, 0.08);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .flex-gap {
+      gap: 16px;
+      display: flex;
+      flex-wrap: wrap
+    }
+
+    #result {
+      font-size: 1.25rem;
+      word-break: break-all;
+      background: var(--bg-light);
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1.5px solid #b6c6e3;
+      min-height: 48px;
+      color: var(--primary);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .small-note {
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e3e8ee;
+    }
+
+    .pw-border-weak {
+      border: 2px solid var(--danger)
+    }
+
+    .pw-border-med {
+      border: 2px solid var(--warning)
+    }
+
+    .pw-border-strong {
+      border: 2px solid var(--success)
+    }
+
+    .btn-outline-dark {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: transparent;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+
+    .btn-outline-dark:hover,
+    .btn-outline-dark:focus {
+      background: var(--primary);
+      color: #fff !important;
+      border-color: var(--primary);
+    }
+
+    .btn-outline-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus {
+      background: #1746a2;
+      color: #fff;
+    }
+
+    .btn-outline-secondary {
+      border-color: #64748b;
+      color: #64748b;
+      background: transparent;
+    }
+
+    .btn-outline-secondary:hover,
+    .btn-outline-secondary:focus {
+      background: #64748b;
+      color: #fff;
+      border-color: #64748b;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .progress {
+      background: #e3e8ee;
+      border-radius: 8px;
+      height: 22px;
+    }
+
+    .progress-bar {
+      font-weight: bold;
+      font-size: 1rem;
+      line-height: 22px;
+      background: var(--primary);
+      color: #fff;
+      transition: background 0.3s;
+    }
+
+    .progress-bar.bg-danger {
+      background: var(--danger) !important;
+    }
+
+    .progress-bar.bg-warning {
+      background: var(--warning) !important;
+      color: #22223b !important;
+    }
+
+    .progress-bar.bg-success {
+      background: var(--success) !important;
+    }
+
+    ul {
+      margin-top: 12px;
+      margin-bottom: 0;
+      padding-left: 1.2rem;
+    }
+
+    ul li {
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e0eafc;
+      margin-right: 6px
+    }
+
+    .icon-btn {
+      cursor: pointer;
+      color: var(--primary);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: #1746a2;
+      transform: scale(1.15);
+    }
+
+    @media(max-width:768px) {
+      main>.container {
+        padding: 16px
+      }
+
+      .flex-col {
+        flex-direction: column
+      }
+    }
+
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      background-image: none;
+    }
+
+    body.dark-mode main>.container {
+      background: var(--bg-dark-card);
+      color: var(--text-light);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4)
+    }
+
+    body.dark-mode #result {
+      background: #23272b;
+      border-color: #444;
+      color: #7dd3fc;
+    }
+
+    body.dark-mode .form-label,
+    body.dark-mode label,
+    body.dark-mode h2,
+    body.dark-mode h1,
+    body.dark-mode h4,
+    body.dark-mode h6 {
+      color: #7dd3fc !important;
+    }
+
+    body.dark-mode .progress {
+      background: #23272b !important;
+    }
+
+    body.dark-mode .progress-bar {
+      background: #2563eb !important;
+      color: #fff !important;
+    }
+
+    body.dark-mode .progress-bar.bg-danger {
+      background: #e11d48 !important;
+    }
+
+    body.dark-mode .progress-bar.bg-warning {
+      background: #fbbf24 !important;
+      color: #181a1b !important;
+    }
+
+    body.dark-mode .progress-bar.bg-success {
+      background: #22d3ee !important;
+    }
+
+    body.dark-mode .btn-outline-dark {
+      color: #7dd3fc !important;
+      border-color: #7dd3fc !important;
+    }
+
+    body.dark-mode .btn-outline-dark:hover {
+      background-color: #2563eb !important;
+      color: #fff !important;
+      border-color: #2563eb !important;
+    }
+
+    body.dark-mode .btn-outline-primary {
+      background: #2563eb !important;
+      color: #fff !important;
+    }
+
+    body.dark-mode .btn-outline-primary:hover {
+      background: #1746a2 !important;
+      color: #fff !important;
+    }
+
+    body.dark-mode .btn-outline-secondary {
+      color: #a5b4fc !important;
+      border-color: #a5b4fc !important;
+    }
+
+    body.dark-mode .btn-outline-secondary:hover {
+      background: #a5b4fc !important;
+      color: #181a1b !important;
+      border-color: #a5b4fc !important;
+    }
+
+    body.dark-mode .chip {
+      background: #23272b;
+      color: #7dd3fc;
+    }
+
+    body.dark-mode .icon-btn {
+      color: #7dd3fc;
+    }
+
+    body.dark-mode .icon-btn:hover {
+      color: #38bdf8;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 
 <body>
-    <h1 class="text-center p-2">Random Password Generator And Password Strength Checker</h1>
-    <main>
-        <section class="p-5">
-            <h2 class="text-center">Random Password Generator</h2>
-            <button type="button" class="btn btn-outline-dark" onclick="Generate()">Generate Password</button>
-            <br>
-            <div id="result"></div>
-            <br>
-            <i class="material-icons" style="font-size:36px" onclick="copyText()">content_copy</i>
+  <div class="d-flex justify-content-end align-items-center p-2">
+    <label class="form-check-label me-2" for="darkModeSwitch">Dark Mode</label>
+    <input class="form-check-input" type="checkbox" id="darkModeSwitch" onclick="toggleDarkMode()">
+  </div>
+  <main>
+    <div class="container">
+      <h2 class="mb-3">Password Toolbox — Generator, Strength & Breach Check</h2>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="p-3">
+            <h4>Generator</h4>
+            <div class="small-note mb-2">Customize characters and options below.</div>
+            <div class="mb-2">
+              <label for="passwordLength" class="form-label">Length: <span id="lengthValue">12</span></label>
+              <input id="passwordLength" type="range" min="6" max="64" value="12" class="form-range"
+                oninput="document.getElementById('lengthValue').innerText=this.value">
+            </div>
+            <div class="mb-2 flex-gap">
+              <div><input type="checkbox" id="optUpper" checked> <label for="optUpper">Uppercase</label></div>
+              <div><input type="checkbox" id="optLower" checked> <label for="optLower">Lowercase</label></div>
+              <div><input type="checkbox" id="optNumbers" checked> <label for="optNumbers">Numbers</label></div>
+              <div><input type="checkbox" id="optSpecial" checked> <label for="optSpecial">Special</label></div>
+            </div>
+            <div class="mb-2 flex-gap">
+              <div><input type="checkbox" id="optAvoidAmbig"> <label for="optAvoidAmbig">Avoid ambiguous (0O1lI)</label>
+              </div>
+              <div><input type="checkbox" id="optIncludeSimilar"> <label for="optIncludeSimilar">Allow similar</label>
+              </div>
+            </div>
+            <div class="mb-2">
+              <button class="btn btn-outline-dark me-2" onclick="Generate()">Generate Password</button>
+              <button class="btn btn-outline-primary" onclick="generatePassphrase()">Generate Passphrase</button>
+              <button class="btn btn-outline-secondary" onclick="exportCurrent()">Export</button>
+            </div>
+            <div id="result" class="mb-2"></div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="material-icons icon-btn" style="font-size:28px" onclick="copyText()"
+                title="Copy">content_copy</i>
+              <i class="material-icons icon-btn" style="font-size:28px" onclick="autoClearClipboardToggle()"
+                id="autoClearIcon" title="Auto-clear clipboard">timer</i>
+              <i class="material-icons icon-btn" style="font-size:28px" onclick="saveToHistory()"
+                title="Save to history">save</i>
+              <div id="copyFeedback" class="small-note"></div>
+            </div>
+            <div class="mt-3">
+              <h6>History</h6>
+              <div id="historyList" style="max-height:200px;overflow:auto;"></div>
+              <div class="mt-2"><button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear
+                  History</button></div>
+            </div>
+            <div class="mt-3">
+              <h6>Expiry Reminder</h6>
+              <div class="small-note">Set days until expiry for saved passwords.</div>
+              <div class="input-group mt-2" style="max-width:240px;">
+                <input id="expiryDays" type="number" class="form-control" placeholder="Days (e.g., 90)" min="1">
+                <button class="btn btn-outline-secondary" onclick="setExpiry()">Set</button>
+              </div>
+              <div id="expiryInfo" class="small-note mt-2"></div>
+            </div>
+          </div>
+        </div>
 
-        </section>
-        <section class="p-3">
-            <h2>Password Strength Checker</h2>
-            <input type="password" id="password" placeholder="Enter Password">
-            <br>
-            <button type="button" class="btn btn-outline-dark" onclick="StrengthChecker()">Check Strength</button>
-            <br>
+        <div class="col-md-6">
+          <div class="p-3">
+            <h4>Strength Checker & Breach</h4>
+            <div class="mb-2 d-flex align-items-center">
+              <input type="password" id="password" placeholder="Type or paste password" class="form-control me-2"
+                oninput="StrengthCheckerRealtime()" aria-label="Password input">
+              <button class="btn btn-outline-secondary" onclick="toggleShow()"><i id="eyeIcon"
+                  class="material-icons">visibility</i></button>
+            </div>
+            <div class="progress my-2" style="height:20px;">
+              <div id="strengthMeter" class="progress-bar" role="progressbar" style="width:0%"> </div>
+            </div>
+            <div class="mb-2 small-note">Entropy: <span id="entropyBits">0</span> bits</div>
+            <div class="mb-2 small-note">Common password check: <span id="commonCheck">—</span></div>
+            <div id="pwnedFeedback" class="fw-bold mb-2"></div>
             <ul>
-                <li id="Uppercase">Atleast one Uppercase</li>
-                <li id="Lowercase"> Atleast one Lowercase</li>
-                <li id="Number">Atleast one Number</li>
-                <li id="SpecialCharacter">Atleast one Special Character</li>
-                <li id="Length">Password Length minimum 8 characters</li>
+              <li id="Uppercase">At least one Uppercase</li>
+              <li id="Lowercase">At least one Lowercase</li>
+              <li id="Number">At least one Number</li>
+              <li id="SpecialCharacter">At least one Special Character</li>
+              <li id="Length">Password Length minimum 8 characters</li>
             </ul>
-        </section>
+            <div class="mt-3">
+              <h6>Suggestions</h6>
+              <div id="suggestions" class="small-note"></div>
+            </div>
+            <div class="mt-3">
+              <h6>Save / Export</h6>
+              <div class="input-group mb-2" style="max-width:420px;">
+                <input id="saveLabel" class="form-control" placeholder="Label (e.g., email account)">
+                <button class="btn btn-outline-primary" onclick="saveCurrent()">Save</button>
+              </div>
+              <div class="small-note">Save to local history (encrypted optional). Warning: local device storage only.
+              </div>
+            </div>
+            <div class="mt-3">
+              <h6>Settings & Quick Checks</h6>
+              <div class="small-note">Auto-run breach check as you type: <input type="checkbox" id="autoPwn" checked>
+              </div>
+              <div class="small-note">Most common passwords are checked locally for speed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    </main>
-    <script src="index.js" >
-       
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        
+        <div><button class="btn btn-sm btn-outline-secondary" onclick="downloadAll()">Download All Saved</button></div>
+      </div>
+    </div>
+  </main>
 
-    </script>
+  <script src="index.js"></script>
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+    // On load, restore dark mode if previously set
+    window.addEventListener('DOMContentLoaded', function() {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        var darkSwitch = document.getElementById('darkModeSwitch');
+        if (darkSwitch) darkSwitch.checked = true;
+      }
+    });
+  </script>
 </body>
 
 </html>
